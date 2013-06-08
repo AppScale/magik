@@ -13,10 +13,11 @@ import boto.s3.connection
 
 
 # S3Storage-specific imports
+from base_storage import BaseStorage
 from custom_exceptions import BadConfigurationException
 
 
-class S3Storage():
+class S3Storage(BaseStorage):
   """ S3Storage provides callers with an interface to Amazon S3, and other
   services that are API-compatible with it (e.g., Walrus). """
 
