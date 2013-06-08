@@ -6,6 +6,7 @@ to create connections to each type of cloud storage that magik supports. """
 
 # magik-specific imports
 from custom_exceptions import BadConfigurationException
+from s3_storage import S3Storage
 
 
 class StorageFactory():
@@ -38,7 +39,7 @@ class StorageFactory():
 
     storage_name = parameters['name']
     if storage_name == 's3':
-      pass
+      return S3Storage(parameters)
     else:
       raise NotImplementedError('{0} is not a supported cloud storage' \
         .format(storage_name))
