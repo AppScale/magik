@@ -8,6 +8,10 @@ interact with Amazon's Simple Storage Service (S3). """
 import re
 
 
+# Third-party libraries
+import boto.s3.connection
+
+
 # S3Storage-specific imports
 from custom_exceptions import BadConfigurationException
 
@@ -41,8 +45,39 @@ class S3Storage():
 
     if 'S3_URL' in parameters:
       # Make sure it's a URL before we assign it.
-      if re.match('http://(.*):8773/services/Walrus', parameters['S3_URL']):
+      s3_host_matchdata = re.match('http://(.*):8773/services/Walrus',
+        parameters['S3_URL'])
+      if s3_host_matchdata:
         self.s3_url = parameters['S3_URL']
+        self.s3_host = s3_host_matchdata.group(1)
       else:
         raise BadConfigurationException('{0} is not a valid S3 URL. Must be ' +
           'of the form http://1.2.3.4:8773/services/Walrus.')
+
+    self.s3_connection = self.create_s3_connection()
+    # TODO(cgb): Consider validating the user's credentials here, and throw
+    # a BadConfigurationException if they aren't valid.
+
+
+  def create_s3_connection(self):
+    """ Uses boto to connect to Amazon S3, or a S3-compatible service if S3_URL
+    is specified.
+
+    Returns:
+      A boto.s3.Connection, which represents a connection to Amazon S3.
+    """
+    if hasattr(self, 's3_url'):
+      calling_format=boto.s3.connection.OrdinaryCallingFormat()
+      connection = boto.s3.connection.S3Connection(
+        aws_access_key_id=self.aws_access_key,
+        aws_secret_access_key=self.aws_secret_key,
+        is_secure=False,
+        host=self.s3_host,
+        port=8773,
+        calling_format=calling_format,
+        path="/services/Walrus")
+    else:
+      connection = boto.s3.connection.S3Connection(
+        aws_access_key_id=self.aws_access_key,
+        aws_secret_access_key=self.aws_secret_key)
+    return connection
