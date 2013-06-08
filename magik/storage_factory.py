@@ -4,6 +4,10 @@
 to create connections to each type of cloud storage that magik supports. """
 
 
+# magik-specific imports
+from custom_exceptions import BadConfigurationException
+
+
 class StorageFactory():
   """ StorageFactory provides callers with a simple, unified interface that can
   be used to get a *Storage object. """
@@ -24,7 +28,17 @@ class StorageFactory():
         we should interact with, and the storage-specific credentials needed
         to use this storage service.
     Raises:
+      BadConfigurationException: If the caller fails to specify a cloud storage
+        platform to instantiate.
       NotImplementedError: If the cloud storage platform named is not one that
         magik supports.
     """
-    pass
+    if 'name' not in parameters:
+      raise BadConfigurationException('Need to specify a cloud storage name.')
+
+    storage_name = parameters['name']
+    if storage_name == 's3':
+      pass
+    else:
+      raise NotImplementedError('{0} is not a supported cloud storage' \
+        .format(storage_name))

@@ -23,4 +23,4 @@ class TestS3Storage(unittest.TestCase):
 
 
   def test_upload_files(self):
-    s3 = StorageFactory.get_storage({})
+    s3 = StorageFactory.get_storage({"name" : "s3"})
