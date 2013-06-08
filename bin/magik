@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+# Programmer: Chris Bunch (chris@appscale.com)
+""" A Python script that provides a command-line interface to cloud storage
+offerings. """
+
+# import lib
+
+if __name__ == "__main__":
+  pass
+  # parse arguments, find out what directive is
+  # getattr(???, directive)(args)

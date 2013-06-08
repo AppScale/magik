@@ -6,9 +6,9 @@ import unittest
 
 
 # imports for upload helper tests
-from test_upload_helper import TestUploadHelper
+from test_s3_storage import TestS3Storage
 
-test_cases = [TestUploadHelper]
+test_cases = [TestS3Storage]
 
 test_case_names = []
 for cls in test_cases:
