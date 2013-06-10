@@ -100,45 +100,35 @@ class S3Storage(BaseStorage):
     key.set_contents_from_filename(source)
 
 
-  def download_files(self, source_to_dest_list):
-    """ Downloads one or more files from Amazon S3.
+  def does_key_exist(self, bucket_name, key_name):
+    """ Queries Amazon S3 to see if the named file exists.
 
     Args:
-      source_to_dest_list: A list of dicts, where each dict has a key named
-        'source' that points to the file in Amazon S3 to download, and a key
-        named 'destination' that points to where it should be downloaded.
+      bucket_name: A str containing the name of the bucket that the file exists
+        in.
+      key_name: A str containing the name of the key that identifies the file.
     Returns:
-      A copy of the same list of dicts that was passed in as an argument,
-        with an extra field in each dict indicating if the download was
-        successful, and in case of failures, a field that explains why the
-        download failed.
+      True if a file does exist in the named bucket with the provided key name,
+        and False otherwise.
     """
-    # TODO(cgb): Parallelize the download process.
-    download_result = source_to_dest_list[:]
+    bucket = self.connection.lookup(bucket_name)
+    key = boto.s3.key.Key(bucket)
+    key.key = key_name
+    return key.exists()
 
-    for item_to_download in download_result:
-      # First, make sure the item to download actually exists.
-      source = item_to_download['source']
-      bucket_name = source.split('/')[1]
-      key_name = "/".join(source.split('/')[2:])
 
-      # It definitely doesn't exist if the bucket doesn't exist.
-      bucket = self.connection.lookup(bucket_name)
-      if not bucket:
-        item_to_download['success'] = False
-        item_to_download['failure_reason'] = 'bucket not found'
-        continue
+  def download_file(self, destination, bucket_name, key_name):
+    """ Downloads a file to the local filesystem from Amazon S3.
 
-      key = boto.s3.key.Key(bucket)
-      key.key = key_name
-      if not key.exists():
-        item_to_download['success'] = False
-        item_to_download['failure_reason'] = 'source not found'
-        continue
-
-      # Finally, download the file.
-      destination = item_to_download['destination']
-      key.get_contents_to_filename(destination)
-      item_to_download['success'] = True
-
-    return download_result
+    Args:
+      destination: A str containing the name of the file on the local filesystem
+        that we should download our file to.
+      bucket_name: A str containing the name of the bucket that the file should
+        be downloaded from.
+      key_name: A str containing the name of the key that the file should be
+        downloaded from.
+    """
+    bucket = self.connection.lookup(bucket_name)
+    key = boto.s3.key.Key(bucket)
+    key.key = key_name
+    key.get_contents_to_filename(destination)

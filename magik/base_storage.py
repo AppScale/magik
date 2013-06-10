@@ -83,4 +83,29 @@ class BaseStorage():
         the download was successful, and in case of failures, a field called
         'failure_reason' that explains why the file could not be downloaded.
     """
-    raise NotImplementedError
+    # TODO(cgb): Parallelize the download process.
+    download_result = source_to_dest_list[:]
+
+    for item_to_download in download_result:
+      # First, make sure the item to download actually exists.
+      source = item_to_download['source']
+      bucket_name = source.split('/')[1]
+      key_name = "/".join(source.split('/')[2:])
+
+      # It definitely doesn't exist if the bucket doesn't exist.
+      if not self.does_bucket_exist(bucket_name):
+        item_to_download['success'] = False
+        item_to_download['failure_reason'] = 'bucket not found'
+        continue
+
+      if not self.does_key_exist(bucket_name, key_name):
+        item_to_download['success'] = False
+        item_to_download['failure_reason'] = 'source not found'
+        continue
+
+      # Finally, download the file.
+      destination = item_to_download['destination']
+      self.download_file(destination, bucket_name, key_name)
+      item_to_download['success'] = True
+
+    return download_result

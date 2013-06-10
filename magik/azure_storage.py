@@ -103,48 +103,35 @@ class AzureStorage(BaseStorage):
       'BlockBlob')
 
 
-  def download_files(self, source_to_dest_list):
-    """ Downloads one or more files from Azure Blob Storage.
+  def does_key_exist(self, container_name, key_name):
+    """ Queries Azure Blob Storage to see if the named file exists.
 
     Args:
-      source_to_dest_list: A list of dicts, where each dict has a key named
-        'source' that points to the file in Azure to download, and a key
-        named 'destination' that points to where it should be downloaded.
+      container_name: A str containing the name of the container that the file
+        exists in.
+      key_name: A str containing the name of the key that identifies the file.
     Returns:
-      A copy of the same list of dicts that was passed in as an argument,
-        with an extra field in each dict indicating if the download was
-        successful, and in case of failures, a field that explains why the
-        download failed.
+      True if a file does exist in the named container with the provided key
+        name, and False otherwise.
     """
-    # TODO(cgb): Parallelize the download process.
-    download_result = source_to_dest_list[:]
+    try:
+      self.connection.get_blob_metadata(container_name, key_name)
+      return True
+    except azure.WindowsAzureMissingResourceError:
+      return False
 
-    for item_to_download in download_result:
-      # First, make sure the item to download actually exists.
-      source = item_to_download['source']
-      bucket_name = source.split('/')[1]
-      key_name = "/".join(source.split('/')[2:])
 
-      # It definitely doesn't exist if the bucket doesn't exist.
-      try:
-        self.connection.get_container_metadata(bucket_name)
-      except azure.WindowsAzureMissingResourceError:
-        item_to_download['success'] = False
-        item_to_download['failure_reason'] = 'bucket not found'
-        continue
+  def download_file(self, destination, container_name, key_name):
+    """ Downloads a file to the local filesystem from Azure Blob Storage.
 
-      try:
-        self.connection.get_blob_metadata(bucket_name, key_name)
-      except azure.WindowsAzureMissingResourceError:
-        item_to_download['success'] = False
-        item_to_download['failure_reason'] = 'source not found'
-        continue
-
-      # Finally, download the file.
-      destination = item_to_download['destination']
-      blob = self.connection.get_blob(bucket_name, key_name)
-      with open(destination, 'w') as file_handle:
-        file_handle.write(blob)
-      item_to_download['success'] = True
-
-    return download_result
+    Args:
+      destination: A str contianing the name of the file on the local filesystem
+        that we should download the named file to.
+      container_name: A str containing the name of the container that the file
+        should be downloaded from.
+      key_name: A str containing the name of the key that the file should be
+        downloaded from.
+    """
+    blob = self.connection.get_blob(container_name, key_name)
+    with open(destination, 'w') as file_handle:
+      file_handle.write(blob)
