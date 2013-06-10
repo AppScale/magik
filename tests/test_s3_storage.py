@@ -63,27 +63,6 @@ class TestS3Storage(unittest.TestCase):
     self.assertEquals("access", s3.aws_access_key)
     self.assertEquals("secret", s3.aws_secret_key)
 
-    # If S3_URL is specified, but it isn't a URL, an Exception should be thrown.
-    self.assertRaises(BadConfigurationException, StorageFactory.get_storage, {
-      "name" : "s3",
-      "AWS_ACCESS_KEY" : "access",
-      "AWS_SECRET_KEY" : "secret",
-      "S3_URL" : "1.2.3.4:8773/services/Walrus"
-    })
-
-    # If S3_URL is specified, and is a URL, that should be fine.
-    flexmock(boto.s3.connection)
-    boto.s3.connection.should_receive('S3Connection')
-    another_s3 = StorageFactory.get_storage({
-      "name" : "s3",
-      "AWS_ACCESS_KEY" : "access",
-      "AWS_SECRET_KEY" : "secret",
-      "S3_URL" : "http://1.2.3.4:8773/services/Walrus"
-    })
-    self.assertEquals("access", another_s3.aws_access_key)
-    self.assertEquals("secret", another_s3.aws_secret_key)
-    self.assertEquals("http://1.2.3.4:8773/services/Walrus", another_s3.s3_url)
-
 
   def test_upload_one_file_and_create_bucket(self):
     file_one_info = {
