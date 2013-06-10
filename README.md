@@ -24,3 +24,12 @@ magik will eventually support
 Google Cloud Storage
 Eucalyptus Walrus
 Microsoft Azure Blob Storage
+
+more TODOs
+==============
+parallelized downloads and uploads for S3
+delete_files for S3
+
+get help
+==============
+E-mail Chris Bunch (chris@appscale.com) or file an issue!
