@@ -3,9 +3,41 @@
 """ A Python script that provides a command-line interface to cloud storage
 offerings. """
 
-# import lib
+
+# General-purpose Python library imports
+import argparse
+import os
+import sys
+
+
+# Magik library imports
+lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
+sys.path.append(lib)
+from storage_factory import StorageFactory
+
 
 if __name__ == "__main__":
-  pass
-  # parse arguments, find out what directive is
-  # getattr(???, directive)(args)
+  parser = argparse.ArgumentParser(description='Upload or download files ' +
+    'from supported cloud storage systems.')
+
+  # Flags not specific to any particular storage service.
+  parser.add_argument('directive', help='the action to take',
+    choices=['upload_files', 'download_files'])
+  parser.add_argument('--source', '-s')
+  parser.add_argument('--destination', '-d')
+  parser.add_argument('--name', '-n',
+    help='the name of the storage service to interact with',
+    choices=['s3'])
+
+  # Flags enabling users to specify their S3 credentials.
+  parser.add_argument('--AWS_ACCESS_KEY')
+  parser.add_argument('--AWS_SECRET_KEY')
+
+  # Parse the arguments and invoke the right command.
+  args = vars(parser.parse_args(sys.argv[1:]))
+  storage = StorageFactory.get_storage(args)
+  source_to_dest_list = [{
+    'source' : args['source'],
+    'destination' : args['destination']
+  }]
+  print getattr(storage, args['directive'])(source_to_dest_list)
