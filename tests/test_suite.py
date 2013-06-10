@@ -5,9 +5,10 @@ import sys
 import unittest
 
 
-# imports for upload helper tests
+# imports for all tests
 from test_azure_storage import TestAzureStorage
 from test_gc_storage import TestGCStorage
+from test_rest_server import TestRESTServer
 from test_s3_storage import TestS3Storage
 from test_storage_factory import TestStorageFactory
 from test_walrus_storage import TestWalrusStorage

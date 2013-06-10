@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+# Programmer: Chris Bunch (chris@appscale.com)
+""" Starts a Python web server that accepts REST-formatted requests to store and
+retrieve data via cloud storage offerings. """
+
+
+# General-purpose Python library imports
+import argparse
+import os
+import sys
+
+
+# Third-party library imports
+from paste import httpserver
+import webapp2
+
+
+# Magik library imports
+lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
+sys.path.append(lib)
+from rest_server import RESTServer
+
+
+if __name__ == "__main__":
+  app = webapp2.WSGIApplication([
+   ('(.*)', RESTServer),
+  ], debug=True)
+
+  httpserver.serve(app, host='127.0.0.1', port='8080')
