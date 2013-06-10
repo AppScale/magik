@@ -33,7 +33,20 @@ class RESTServer(webapp2.RequestHandler):
 
  
   def get(self, path):
-    pass
+    args = self.get_args_from_request_params(self.request)
+    storage = StorageFactory.get_storage(args)
+
+    random_suffix = str(uuid.uuid4()).replace('-', '')[:10]
+    destination = '/tmp/magik-temp-{0}'.format(random_suffix)
+    source_to_dest_list = [{
+      'source' : path,
+      'destination' : destination
+    }]
+    storage.download_files(source_to_dest_list)
+    with open(destination, 'r') as file_handle:
+      self.response.write(file_handle.read())
+    os.remove(destination)
+    return self.SUCCESS
 
 
   def put(self, path):
@@ -51,7 +64,7 @@ class RESTServer(webapp2.RequestHandler):
     source = self.write_temporary_file(file_contents)
     source_to_dest_list = [{
       'source' : source,
-      'destination' : '/' + path
+      'destination' : path
     }]
     self.response.write(storage.upload_files(source_to_dest_list))
     os.remove(source)
