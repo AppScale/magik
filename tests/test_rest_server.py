@@ -18,6 +18,7 @@ from flexmock import flexmock
 lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
 sys.path.append(lib)
 from rest_server import RESTServer
+from storage_factory import StorageFactory
 
 
 class TestRESTServer(unittest.TestCase):
@@ -65,6 +66,17 @@ class TestRESTServer(unittest.TestCase):
     fake_builtins.should_call('open')
     fake_builtins.should_receive('open').with_args('/tmp/magik-temp-123', 'w') \
       .and_return(fake_file)
+
+    # Mock out interacting with S3.
+    fake_storage = flexmock(name='fake_storage')
+    fake_storage.should_receive('upload_files').with_args([{
+      'source' : '/tmp/magik-temp-123',
+      'destination' : '/baz/gbaz.txt'
+    }])
+
+    flexmock(StorageFactory)
+    StorageFactory.should_receive('get_storage').with_args(dict).and_return(
+      fake_storage)
 
     # Mock out writing the response.
     server.response = flexmock()

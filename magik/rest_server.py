@@ -51,7 +51,7 @@ class RESTServer(webapp2.RequestHandler):
     source = self.write_temporary_file(file_contents)
     source_to_dest_list = [{
       'source' : source,
-      'destination' : path
+      'destination' : '/' + path
     }]
     self.response.write(storage.upload_files(source_to_dest_list))
     os.remove(source)
