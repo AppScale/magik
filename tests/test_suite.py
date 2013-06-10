@@ -6,10 +6,11 @@ import unittest
 
 
 # imports for upload helper tests
+from test_gc_storage import TestGCStorage
 from test_s3_storage import TestS3Storage
 from test_storage_factory import TestStorageFactory
 
-test_cases = [TestS3Storage, TestStorageFactory]
+test_cases = [TestGCStorage, TestS3Storage, TestStorageFactory]
 
 test_case_names = []
 for cls in test_cases:

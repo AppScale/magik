@@ -57,7 +57,7 @@ class S3Storage(BaseStorage):
         raise BadConfigurationException('{0} is not a valid S3 URL. Must be ' +
           'of the form http://1.2.3.4:8773/services/Walrus.')
 
-    self.s3_connection = self.create_s3_connection()
+    self.connection = self.create_s3_connection()
     # TODO(cgb): Consider validating the user's credentials here, and throw
     # a BadConfigurationException if they aren't valid.
 
@@ -118,9 +118,9 @@ class S3Storage(BaseStorage):
       key_name = "/".join(destination.split('/')[2:])
 
       # Make sure the bucket actually exists, and create it if it doesn't.
-      bucket = self.s3_connection.lookup(bucket_name)
+      bucket = self.connection.lookup(bucket_name)
       if not bucket:
-        bucket = self.s3_connection.create_bucket(bucket_name)
+        bucket = self.connection.create_bucket(bucket_name)
 
       # Finally, upload the file.
       key = boto.s3.key.Key(bucket)
@@ -154,7 +154,7 @@ class S3Storage(BaseStorage):
       key_name = "/".join(source.split('/')[2:])
 
       # It definitely doesn't exist if the bucket doesn't exist.
-      bucket = self.s3_connection.lookup(bucket_name)
+      bucket = self.connection.lookup(bucket_name)
       if not bucket:
         item_to_download['success'] = False
         item_to_download['failure_reason'] = 'bucket not found'
