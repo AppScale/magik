@@ -95,6 +95,9 @@ class TestWalrusStorage(unittest.TestCase):
     fake_bucket = flexmock(name='name_bucket')
     self.fake_walrus.should_receive('create_bucket').with_args('mybucket') \
       .and_return(fake_bucket)
+    self.fake_walrus.should_receive('lookup').with_args('mybucket') \
+      .and_return(fake_bucket)
+
 
     # Also, presume that we can upload the file fine.
     fake_key = flexmock(name='fake_key')

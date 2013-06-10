@@ -57,53 +57,50 @@ class AzureStorage(BaseStorage):
     return azure.storage.BlobService(self.azure_account_name,
       self.azure_account_key)
 
-
-  def upload_files(self, source_to_dest_list):
-    """ Uploads one or more files to Azure Blob Storage.
+  
+  def does_bucket_exist(self, container_name):
+    """ Queries Microsoft Azure to see if the specified container exists or not.
 
     Args:
-      source_to_dest_list: A list of dicts, where each dict has a key named
-        'source' that points to the file on the local filesystem to upload,
-        and a key named 'destination' that points to where it should be
-        uploaded in Azure. We presume that the bucket name is prepended to
-        the destination path, so a destination of '/mybucket/file.tgz' indicates
-        that we should upload this file to '/file.tgz' in the bucket 'mybucket'.
+      container_name: A str containing the name of the container we wish to
+        query for existence.
     Returns:
-      A copy of source_to_dest_list, with an extra field in each dict that
-        indicates if the upload was successful, and if not successful, the
-        reason why the upload failed.
+      True if the container does exist, and False otherwise.
     """
-    # TODO(cgb): Parallelize the upload process.
-    upload_result = source_to_dest_list[:]
+    try:
+      self.connection.get_container_metadata(container_name)
+      return True
+    except azure.WindowsAzureMissingResourceError:
+      return False
 
-    for item_to_upload in upload_result:
-      # First, make sure the file to upload actually exists.
-      source = item_to_upload['source']
-      if not os.path.exists(source):
-        item_to_upload['success'] = False
-        item_to_upload['failure_reason'] = 'file not found'
-        continue
 
-      # Next, make sure the user specified a bucket in the destination.
-      destination = item_to_upload['destination']
-      bucket_name = destination.split('/')[1]
-      key_name = "/".join(destination.split('/')[2:])
+  def create_bucket(self, container_name):
+    """ Creates the named container in Microsoft Azure Blob Storage.
+    
+    Args:
+      container_name: A str containing the name of the container we wish to
+        create.
+    """
+    self.connection.create_container(container_name)
 
-      # Make sure the bucket actually exists, and create it if it doesn't.
-      try:
-        self.connection.get_container_metadata(bucket_name)
-      except azure.WindowsAzureMissingResourceError:
-        self.connection.create_container(bucket_name)
 
-      # Finally, upload the file.
-      file_contents = None
-      with open(source, 'r') as file_handle:
-        file_contents = file_handle.read()
-      self.connection.put_blob(bucket_name, key_name, file_contents,
-        'BlockBlob')
-      item_to_upload['success'] = True
+  def upload_file(self, source, container_name, key_name):
+    """ Uploads a file from the local filesystem to Microsoft Azure Blob
+    Storage.
 
-    return upload_result
+    Args:
+      source: A str containing the name of the file on the local filesystem that
+        should be uploaded to Azure Blob Storage.
+      container_name: A str containing the name of the container that the file
+        should be placed in.
+      key_name: A str containing the name of the key that the file should be
+        placed in.
+    """
+    file_contents = None
+    with open(source, 'r') as file_handle:
+      file_contents = file_handle.read()
+    self.connection.put_blob(container_name, key_name, file_contents,
+      'BlockBlob')
 
 
   def download_files(self, source_to_dest_list):
