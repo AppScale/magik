@@ -20,9 +20,6 @@ magik supports
 Amazon Simple Storage Service (S3)
 Google Cloud Storage
 Eucalyptus Walrus
-
-magik will eventually support
-==============
 Microsoft Azure Blob Storage
 
 more TODOs

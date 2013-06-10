@@ -6,13 +6,14 @@ import unittest
 
 
 # imports for upload helper tests
+from test_azure_storage import TestAzureStorage
 from test_gc_storage import TestGCStorage
 from test_s3_storage import TestS3Storage
 from test_storage_factory import TestStorageFactory
 from test_walrus_storage import TestWalrusStorage
 
-test_cases = [TestGCStorage, TestS3Storage, TestStorageFactory,
-  TestWalrusStorage]
+test_cases = [TestAzureStorage, TestGCStorage, TestS3Storage,
+  TestStorageFactory, TestWalrusStorage]
 
 test_case_names = []
 for cls in test_cases:
