@@ -85,6 +85,42 @@ class TestS3Storage(unittest.TestCase):
     self.assertEquals("http://1.2.3.4:8773/services/Walrus", another_s3.s3_url)
 
 
+  def test_upload_one_file_and_create_bucket(self):
+    file_one_info = {
+      'source' : '/baz/boo/fbar1.tgz',
+      'destination' : '/mybucket/files/fbar1.tgz'
+    }
+
+    # Presume that the local file does exist.
+    flexmock(os.path)
+    os.path.should_call('exists')
+    os.path.should_receive('exists').with_args('/baz/boo/fbar1.tgz') \
+      .and_return(True)
+
+    # And presume that our bucket does not exist.
+    self.fake_s3.should_receive('lookup').with_args('mybucket').and_return(None)
+
+    # We thus need to be able to create the bucket.
+    fake_bucket = flexmock(name='name_bucket')
+    self.fake_s3.should_receive('create_bucket').with_args('mybucket') \
+      .and_return(fake_bucket)
+
+    # Also, presume that we can upload the file fine.
+    fake_key = flexmock(name='fake_key')
+    flexmock(boto.s3.key)
+    boto.s3.key.should_receive('Key').with_args(fake_bucket).and_return(
+      fake_key)
+    fake_key.should_receive('key').with_args('files/fbar1.tgz')
+    fake_key.should_receive('set_contents_from_filename') \
+      .with_args('/baz/boo/fbar1.tgz')
+
+    # Finally, make sure we can upload our file successfully.
+    upload_info = [file_one_info]
+    actual = self.s3.upload_files(upload_info)
+    for upload_result in actual:
+      self.assertEquals(True, upload_result['success'])
+
+
   def test_upload_two_files_that_exist(self):
     # Set up mocks for the first file.
     file_one_info = {
