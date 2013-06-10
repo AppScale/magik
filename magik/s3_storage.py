@@ -5,11 +5,13 @@ interact with Amazon's Simple Storage Service (S3). """
 
 
 # General-purpose Python library imports
+import os.path
 import re
 
 
 # Third-party libraries
 import boto.s3.connection
+import boto.s3.key
 
 
 # S3Storage-specific imports
@@ -82,3 +84,46 @@ class S3Storage(BaseStorage):
         aws_access_key_id=self.aws_access_key,
         aws_secret_access_key=self.aws_secret_key)
     return connection
+
+
+  def upload_files(self, source_to_dest_list):
+    """ Uploads one or more files to Amazon S3.
+
+    Args:
+      source_to_dest_list: A list of dicts, where each dict has a key named
+        'source' that points to the file on the local filesystem to upload,
+        and a key named 'destination' that points to where it should be
+        uploaded in Amazon S3. We presume that the bucket name is prepended to
+        the destination path, so a destination of '/mybucket/file.tgz' indicates
+        that we should upload this file to '/file.tgz' in the bucket 'mybucket'.
+    Returns:
+      A copy of source_to_dest_list, with an extra field in each dict that
+        indicates if the upload was successful, and if not successful, the
+        reason why the upload failed.
+    """
+    # TODO(cgb): Parallelize the upload process.
+    upload_result = source_to_dest_list[:]
+
+    for item_to_upload in upload_result:
+      # First, make sure the file to upload actually exists.
+      source = item_to_upload['source']
+      if not os.path.exists(source):
+        item_to_upload['success'] = False
+        item_to_upload['failure_reason'] = 'file not found'
+        continue
+
+      # Next, make sure the user specified a bucket in the destination.
+      destination = item_to_upload['destination']
+      bucket_name = destination.split('/')[1]
+      key_name = "/".join(destination.split('/')[2:])
+
+      # Make sure the bucket actually exists, and create it if it doesn't.
+      bucket = self.s3_connection.lookup(bucket_name)
+
+      # Finally, upload the file.
+      key = boto.s3.key.Key(bucket)
+      key.key = key_name
+      key.set_contents_from_filename(source)
+      item_to_upload['success'] = True
+
+    return upload_result

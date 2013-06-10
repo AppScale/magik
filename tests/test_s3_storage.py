@@ -9,7 +9,9 @@ import sys
 import unittest
 
 
-# Third-party testing libraries
+# Third-party libraries
+import boto.s3.connection
+import boto.s3.key
 from flexmock import flexmock
 
 
@@ -21,6 +23,21 @@ from storage_factory import StorageFactory
 
 
 class TestS3Storage(unittest.TestCase):
+
+
+  def setUp(self):
+    # Set up a mock for when we interact with S3
+    self.fake_s3 = flexmock(name='fake_s3')
+    flexmock(boto.s3.connection)
+    boto.s3.connection.should_receive('S3Connection').with_args(
+      aws_access_key_id='access', aws_secret_access_key='secret') \
+      .and_return(self.fake_s3)
+
+    self.s3 = StorageFactory.get_storage({
+      "name" : "s3",
+      "AWS_ACCESS_KEY" : "access",
+      "AWS_SECRET_KEY" : "secret"
+    })
 
 
   def test_s3_storage_creation_without_necessary_parameters(self):
@@ -55,6 +72,8 @@ class TestS3Storage(unittest.TestCase):
     })
 
     # If S3_URL is specified, and is a URL, that should be fine.
+    flexmock(boto.s3.connection)
+    boto.s3.connection.should_receive('S3Connection')
     another_s3 = StorageFactory.get_storage({
       "name" : "s3",
       "AWS_ACCESS_KEY" : "access",
@@ -64,3 +83,52 @@ class TestS3Storage(unittest.TestCase):
     self.assertEquals("access", another_s3.aws_access_key)
     self.assertEquals("secret", another_s3.aws_secret_key)
     self.assertEquals("http://1.2.3.4:8773/services/Walrus", another_s3.s3_url)
+
+
+  def test_upload_two_files_that_exist(self):
+    # Set up mocks for the first file.
+    file_one_info = {
+      'source' : '/baz/boo/fbar1.tgz',
+      'destination' : '/mybucket/files/fbar1.tgz'
+    }
+
+    # Presume that the local file does exist.
+    flexmock(os.path)
+    os.path.should_call('exists')
+    os.path.should_receive('exists').with_args('/baz/boo/fbar1.tgz') \
+      .and_return(True)
+
+    # And presume that our bucket exists.
+    fake_bucket = flexmock(name='name_bucket')
+    self.fake_s3.should_receive('lookup').with_args('mybucket').and_return(
+      fake_bucket)
+
+    # Also, presume that we can upload the file fine.
+    fake_key = flexmock(name='fake_key')
+    flexmock(boto.s3.key)
+    boto.s3.key.should_receive('Key').with_args(fake_bucket).and_return(
+      fake_key)
+    fake_key.should_receive('key').with_args('files/fbar1.tgz')
+    fake_key.should_receive('set_contents_from_filename') \
+      .with_args('/baz/boo/fbar1.tgz')
+
+    # Set up mocks for the second file.
+    file_two_info = {
+      'source' : '/baz/boo/fbar2.tgz',
+      'destination' : '/mybucket/files/fbar2.tgz'
+    }
+
+    # Presume that the local file does exist.
+    os.path.should_receive('exists').with_args('/baz/boo/fbar2.tgz') \
+      .and_return(True)
+
+    # Also, presume that we can upload the file fine.
+    fake_key.should_receive('key').with_args('files/fbar2.tgz')
+    fake_key.should_receive('set_contents_from_filename') \
+      .with_args('/baz/boo/fbar2.tgz')
+
+    # Finally, make sure we can upload our files successfully.
+    upload_info = [file_one_info, file_two_info]
+    actual = self.s3.upload_files(upload_info)
+    for upload_result in actual:
+      self.assertEquals(True, upload_result['success'])
