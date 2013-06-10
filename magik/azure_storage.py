@@ -52,9 +52,10 @@ class AzureStorage(BaseStorage):
     """ Uses the Azure SDK for Python to connect to Azure Blob Storage.
 
     Returns:
-      ???
+      A BlobService object, which represents a connection to Azure Blob Storage.
     """
-    raise NotImplementedError
+    return azure.storage.BlobService(self.azure_account_name,
+      self.azure_account_key)
 
 
   def upload_files(self, source_to_dest_list):
@@ -89,14 +90,17 @@ class AzureStorage(BaseStorage):
       key_name = "/".join(destination.split('/')[2:])
 
       # Make sure the bucket actually exists, and create it if it doesn't.
-      bucket = self.connection.lookup(bucket_name)
-      if not bucket:
-        bucket = self.connection.create_bucket(bucket_name)
+      try:
+        self.connection.get_container_metadata(bucket_name)
+      except azure.WindowsAzureMissingResourceError:
+        self.connection.create_container(bucket_name)
 
       # Finally, upload the file.
-      key = boto.s3.key.Key(bucket)
-      key.key = key_name
-      key.set_contents_from_filename(source)
+      file_contents = None
+      with open(source, 'r') as file_handle:
+        file_contents = file_handle.read()
+      self.connection.put_blob(bucket_name, key_name, file_contents,
+        'BlockBlob')
       item_to_upload['success'] = True
 
     return upload_result
@@ -125,22 +129,25 @@ class AzureStorage(BaseStorage):
       key_name = "/".join(source.split('/')[2:])
 
       # It definitely doesn't exist if the bucket doesn't exist.
-      bucket = self.connection.lookup(bucket_name)
-      if not bucket:
+      try:
+        self.connection.get_container_metadata(bucket_name)
+      except azure.WindowsAzureMissingResourceError:
         item_to_download['success'] = False
         item_to_download['failure_reason'] = 'bucket not found'
         continue
 
-      key = boto.s3.key.Key(bucket)
-      key.key = key_name
-      if not key.exists():
+      try:
+        self.connection.get_blob_metadata(bucket_name, key_name)
+      except azure.WindowsAzureMissingResourceError:
         item_to_download['success'] = False
         item_to_download['failure_reason'] = 'source not found'
         continue
 
       # Finally, download the file.
       destination = item_to_download['destination']
-      key.get_contents_to_filename(destination)
+      blob = self.connection.get_blob(bucket_name, key_name)
+      with open(destination, 'w') as file_handle:
+        file_handle.write(blob)
       item_to_download['success'] = True
 
     return download_result
