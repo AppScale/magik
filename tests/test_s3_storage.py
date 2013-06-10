@@ -170,6 +170,25 @@ class TestS3Storage(unittest.TestCase):
       self.assertEquals(True, upload_result['success'])
 
 
+  def test_download_one_file_that_doesnt_exist(self):
+    # Set up mocks for the first file.
+    file_one_info = {
+      'source' : '/mybucket/files/fbar1.tgz',
+      'destination' : '/baz/boo/fbar1.tgz'
+    }
+
+    # And presume that our bucket does not exist.
+    fake_bucket = flexmock(name='name_bucket')
+    self.fake_s3.should_receive('lookup').with_args('mybucket').and_return(None)
+
+    # Finally, make sure we can't download our file.
+    download_info = [file_one_info]
+    actual = self.s3.download_files(download_info)
+    for download_result in actual:
+      self.assertEquals(False, download_result['success'])
+      self.assertEquals('bucket not found', download_result['failure_reason'])
+
+
   def test_download_two_files_that_exist(self):
     # Set up mocks for the first file.
     file_one_info = {
