@@ -3,6 +3,13 @@ magik
 
 Makes it easy to upload and download files to supported cloud storage systems.
 
+dependencies
+==============
+```
+easy_install boto
+easy_install azure
+```
+
 upload a file
 ==============
 ```
