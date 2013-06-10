@@ -1,0 +1,3 @@
+watch('(.*).(py)') { |md|
+  system "python tests/test_suite.py"
+}
