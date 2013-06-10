@@ -10,6 +10,13 @@ easy_install boto
 easy_install azure
 ```
 
+when using magik-server:
+```
+easy_install WebOb
+easy_install Paste
+easy_install webapp2
+```
+
 upload a file
 ==============
 ```
