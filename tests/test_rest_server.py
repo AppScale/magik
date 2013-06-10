@@ -22,5 +22,11 @@ from rest_server import RESTServer
 class TestRESTServer(unittest.TestCase):
 
 
-  def test_nothing_yet(self):
-    pass
+  def test_put_route(self):
+    # If the user fails to pass in a request body, it should fail.
+    server = RESTServer()
+    server.request = flexmock(body='')
+    server.response = flexmock()
+    server.response.should_receive('write').and_return()
+
+    self.assertEquals(RESTServer.FAILURE, server.put('baz/gbaz.txt'))

@@ -13,7 +13,7 @@ from test_s3_storage import TestS3Storage
 from test_storage_factory import TestStorageFactory
 from test_walrus_storage import TestWalrusStorage
 
-test_cases = [TestAzureStorage, TestGCStorage, TestS3Storage,
+test_cases = [TestAzureStorage, TestGCStorage, TestRESTServer, TestS3Storage,
   TestStorageFactory, TestWalrusStorage]
 
 test_case_names = []

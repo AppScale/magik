@@ -18,11 +18,13 @@ import webapp2
 # Magik library imports
 lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
 sys.path.append(lib)
+from rest_server import MagikUI
 from rest_server import RESTServer
 
 
 if __name__ == "__main__":
   app = webapp2.WSGIApplication([
+   ('/', MagikUI),
    ('(.*)', RESTServer),
   ], debug=True)
 
