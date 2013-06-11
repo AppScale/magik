@@ -118,7 +118,16 @@ class RESTServer(webapp2.RequestHandler):
     }]
     self.response.write(storage.upload_files(source_to_dest_list))
     os.remove(source)
-    return self.SUCCESS
+    return
+
+
+  def delete(self, path):
+    args = self.get_args_from_request_params(self.request)
+    storage = StorageFactory.get_storage(args)
+    files_to_delete = [{
+      'source' : path
+    }]
+    self.response.write(storage.delete_files(files_to_delete))
 
 
   def get_args_from_request_params(self, request):
