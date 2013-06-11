@@ -84,6 +84,9 @@ class TestGCStorage(unittest.TestCase):
     fake_bucket = flexmock(name='name_bucket')
     self.fake_gcs.should_receive('create_bucket').with_args('mybucket') \
       .and_return(fake_bucket)
+    self.fake_gcs.should_receive('lookup').with_args('mybucket') \
+      .and_return(fake_bucket)
+
 
     # Also, presume that we can upload the file fine.
     fake_key = flexmock(name='fake_key')
@@ -213,3 +216,44 @@ class TestGCStorage(unittest.TestCase):
     actual = self.gcs.download_files(download_info)
     for download_result in actual:
       self.assertEquals(True, download_result['success'])
+
+
+  def test_delete_two_files_that_exist(self):
+    # Set up mocks for the first file.
+    file_one_info = {
+      'source' : '/mybucket/files/fbar1.tgz'
+    }
+
+    # And presume that our bucket exists.
+    fake_bucket = flexmock(name='name_bucket')
+    self.fake_gcs.should_receive('lookup').with_args('mybucket').and_return(
+      fake_bucket)
+
+    # Presume that our first file does exist.
+    fake_key = flexmock(name='fake_key')
+    flexmock(boto.s3.key)
+    boto.s3.key.should_receive('Key').with_args(fake_bucket).and_return(
+      fake_key)
+    fake_key.should_receive('key').with_args('boo/fbar1.tgz')
+    fake_key.should_receive('exists').and_return(True)
+
+    # And presume that we can delete the file.
+    fake_key.should_receive('delete')
+
+    # Set up mocks for the second file.
+    file_two_info = {
+      'source' : '/mybucket/files/fbar2.tgz'
+    }
+
+    # Presume that our second file does exist.
+    fake_key.should_receive('key').with_args('boo/fbar2.tgz')
+    fake_key.should_receive('exists').and_return(True)
+
+    # And presume that we can delete the file.
+    fake_key.should_receive('delete')
+
+    # Finally, make sure we can download our files successfully.
+    delete_info = [file_one_info, file_two_info]
+    actual = self.gcs.delete_files(delete_info)
+    for delete_result in actual:
+      self.assertEquals(True, delete_result['success'])
