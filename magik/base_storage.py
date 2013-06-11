@@ -109,3 +109,45 @@ class BaseStorage():
       item_to_download['success'] = True
 
     return download_result
+
+
+  def delete_files(self, files_to_delete):
+    """ Deletes one or more files from the storage platform.
+
+    Args:
+      files_to_delete: A list of dicts, where each dict has a key named
+        'source' that points to the file on the storage platform to delete.
+        Note that we intentionally use a dict here, even though it only has
+        one key/value pair at the time, in case we need to expand it in the
+        future to include other information (e.g., what region the file is in).
+    Returns:
+      A copy of the same list of dicts that was passed in as an argument,
+        with an extra field in each dict named 'success', that indicates if
+        the deletion was successful, and in case of failures, a field called
+        'failure_reason' that explains why the file could not be deleted.
+    """
+    # TODO(cgb): Parallelize the deletion process.
+    delete_result = files_to_delete[:]
+
+    for item_to_delete in files_to_delete:
+      # First, make sure the item to delete actually exists.
+      source = item_to_delete['source']
+      bucket_name = source.split('/')[1]
+      key_name = "/".join(source.split('/')[2:])
+
+      # It definitely doesn't exist if the bucket doesn't exist.
+      if not self.does_bucket_exist(bucket_name):
+        item_to_delete['success'] = False
+        item_to_delete['failure_reason'] = 'bucket not found'
+        continue
+
+      if not self.does_key_exist(bucket_name, key_name):
+        item_to_delete['success'] = False
+        item_to_delete['failure_reason'] = 'source not found'
+        continue
+
+      # Finally, download the file.
+      self.delete_file(bucket_name, key_name)
+      item_to_delete['success'] = True
+
+    return delete_result

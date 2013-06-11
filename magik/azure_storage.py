@@ -135,3 +135,15 @@ class AzureStorage(BaseStorage):
     blob = self.connection.get_blob(container_name, key_name)
     with open(destination, 'w') as file_handle:
       file_handle.write(blob)
+
+
+  def delete_file(self, container_name, key_name):
+    """ Deletes a file stored in Azure Blob Storage.
+
+    Args:
+      container_name: A str containing the name of the container that the file
+        should be deleted from.
+      key_name: A str containing the name of the key that the file should be
+        deleted from.
+    """
+    self.connection.delete_blob(container_name, key_name)
