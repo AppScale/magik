@@ -27,11 +27,15 @@ if __name__ == "__main__":
   parser.add_argument('--destination', '-d')
   parser.add_argument('--name', '-n',
     help='the name of the storage service to interact with',
-    choices=['s3'])
+    choices=StorageFactory.SUPPORTED_STORAGE_PLATFORMS)
 
   # Flags enabling users to specify their S3 credentials.
   parser.add_argument('--AWS_ACCESS_KEY')
   parser.add_argument('--AWS_SECRET_KEY')
+
+  # Flags enabling users to specify their GCS credentials.
+  parser.add_argument('--GCS_ACCESS_KEY')
+  parser.add_argument('--GCS_SECRET_KEY')
 
   # Parse the arguments and invoke the right command.
   args = vars(parser.parse_args(sys.argv[1:]))

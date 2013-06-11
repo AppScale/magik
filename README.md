@@ -18,17 +18,21 @@ magik upload_files --name s3 --AWS_ACCESS_KEY YOUR_ACCESS_KEY --AWS_SECRET_KEY Y
 magik supports
 ==============
 Amazon Simple Storage Service (S3)
+Google Cloud Storage
 
 magik will eventually support
 ==============
-Google Cloud Storage
 Eucalyptus Walrus
 Microsoft Azure Blob Storage
 
 more TODOs
 ==============
-parallelized downloads and uploads for S3
-delete_files for S3
+parallelized downloads and uploads for S3 and GCS
+delete_files for S3 and GCS
+
+miscellaneous
+==============
+to use Google Cloud Storage, you'll need an access key and secret key. get them at https://code.google.com/apis/console#:storage:legacy
 
 get help
 ==============
