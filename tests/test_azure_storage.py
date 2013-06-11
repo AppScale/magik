@@ -219,3 +219,42 @@ class TestAzureStorage(unittest.TestCase):
     actual = self.azure.download_files(download_info)
     for download_result in actual:
       self.assertEquals(True, download_result['success'])
+
+
+  def test_delete_two_files_that_exist(self):
+    # Set up mocks for the first file.
+    file_one_info = {
+      'source' : '/mybucket/files/fbar1.tgz'
+    }
+
+    # And presume that our bucket exists.
+    self.fake_azure.should_receive('get_container_metadata').with_args(
+      'mybucket')
+
+    # Presume that our first file does exist.
+    self.fake_azure.should_receive('get_blob_metadata').with_args('mybucket',
+      'files/fbar1.tgz')
+
+    # And presume that we can delete the file.
+    self.fake_azure.should_receive('delete_blob').with_args('mybucket',
+      'files/fbar1.tgz')
+
+    # Set up mocks for the second file.
+    file_two_info = {
+      'source' : '/mybucket/files/fbar2.tgz',
+      'destination' : '/baz/boo/fbar2.tgz'
+    }
+
+    # Presume that our second file does exist.
+    self.fake_azure.should_receive('get_blob_metadata').with_args('mybucket',
+      'files/fbar2.tgz')
+
+    # And presume that we can delete the file.
+    self.fake_azure.should_receive('delete_blob').with_args('mybucket',
+      'files/fbar2.tgz')
+
+    # Finally, make sure we can delete our files successfully.
+    delete_info = [file_one_info, file_two_info]
+    actual = self.azure.delete_files(delete_info)
+    for delete_result in actual:
+      self.assertEquals(True, delete_result['success'])

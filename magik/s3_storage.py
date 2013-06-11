@@ -132,3 +132,18 @@ class S3Storage(BaseStorage):
     key = boto.s3.key.Key(bucket)
     key.key = key_name
     key.get_contents_to_filename(destination)
+
+
+  def delete_file(self, bucket_name, key_name):
+    """ Deletes a file stored in Amazon S3.
+
+    Args:
+      bucket_name: A str containing the name of the bucket that the file should
+        be downloaded from.
+      key_name: A str containing the name of the key that the file should be
+        downloaded from.
+    """
+    bucket = self.connection.lookup(bucket_name)
+    key = boto.s3.key.Key(bucket)
+    key.key = key_name
+    key.delete()
