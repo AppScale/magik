@@ -53,9 +53,6 @@ class RESTServer(webapp2.RequestHandler):
         storage platform. The name of the bucket should be the first item, so
         a path of '/mybucket/file/name.txt' indicates that the file
         'file/name.txt' should be downloaded from the bucket 'mybucket'.
-    Returns:
-      self.SUCCESS if the file was successfully downloaded. The contents of the
-        file are also written in the response.
     """
     args = self.get_args_from_request_params(self.request)
     if args['name'] == '':
@@ -79,6 +76,7 @@ class RESTServer(webapp2.RequestHandler):
       os.remove(destination)
     else:
       self.response.write(json.dumps(result))
+
     return
 
 
@@ -98,10 +96,6 @@ class RESTServer(webapp2.RequestHandler):
         storage platform. The name of the bucket should be the first item, so
         a path of '/mybucket/file/name.txt' indicates that the file
         'file/name.txt' should be uploaded to the bucket 'mybucket'.
-    Returns:
-      self.SUCCESS if the file was successfully uploaded. A JSON-encoded list
-        is also written in the response that indicates if the upload was
-        successful, and if not, the reason why it failed.
     """
     file_contents = self.request.body
     if file_contents == '':
@@ -125,6 +119,21 @@ class RESTServer(webapp2.RequestHandler):
 
 
   def delete(self, path):
+    """ Deletes a file from a cloud storage platform.
+
+    In addition to the arguments below, this method also expects the following
+    parameters to be posted to it:
+      name: The name of the cloud storage platform to interact with (e.g.,
+        's3').
+      credentials: Any AWS, GCS, Walrus, or Azure credential, that should be
+        used to authenticate this user.
+
+    Args:
+      path: A str that represents the name of the file to delete from the cloud
+        storage platform. The name of the bucket should be the first item, so
+        a path of '/mybucket/file/name.txt' indicates that the file
+        'file/name.txt' should be uploaded to the bucket 'mybucket'.
+    """
     args = self.get_args_from_request_params(self.request)
     storage = StorageFactory.get_storage(args)
     files_to_delete = [{
