@@ -8,6 +8,7 @@ to create connections to each type of cloud storage that magik supports. """
 from custom_exceptions import BadConfigurationException
 from gc_storage import GCStorage
 from s3_storage import S3Storage
+from walrus_storage import WalrusStorage
 
 
 class StorageFactory():
@@ -16,7 +17,7 @@ class StorageFactory():
 
   
   # A tuple containing the cloud storage platforms that magik supports.
-  SUPPORTED_STORAGE_PLATFORMS = ('gcs', 's3')
+  SUPPORTED_STORAGE_PLATFORMS = ('gcs', 's3', 'walrus')
 
 
   @classmethod
@@ -43,6 +44,8 @@ class StorageFactory():
       return GCStorage(parameters)
     elif storage_name == 's3':
       return S3Storage(parameters)
+    elif storage_name == 'walrus':
+      return WalrusStorage(parameters)
     else:
       raise NotImplementedError('{0} is not a supported cloud storage' \
         .format(storage_name))

@@ -19,16 +19,16 @@ magik supports
 ==============
 Amazon Simple Storage Service (S3)
 Google Cloud Storage
+Eucalyptus Walrus
 
 magik will eventually support
 ==============
-Eucalyptus Walrus
 Microsoft Azure Blob Storage
 
 more TODOs
 ==============
-parallelized downloads and uploads for S3 and GCS
-delete_files for S3 and GCS
+parallelized downloads and uploads
+delete_files
 
 miscellaneous
 ==============

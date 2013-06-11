@@ -37,6 +37,10 @@ if __name__ == "__main__":
   parser.add_argument('--GCS_ACCESS_KEY')
   parser.add_argument('--GCS_SECRET_KEY')
 
+  # Flags enabling users to specify their Walrus credentials.
+  parser.add_argument('--S3_URL', help='the location where Walrus is ' +
+    'running (e.g., http://1.2.3.4:8773/services/Walrus)')
+
   # Parse the arguments and invoke the right command.
   args = vars(parser.parse_args(sys.argv[1:]))
   storage = StorageFactory.get_storage(args)
