@@ -47,7 +47,6 @@ Microsoft Azure Blob Storage
 more TODOs
 ==============
 parallelized downloads and uploads
-delete_files
 
 miscellaneous
 ==============
