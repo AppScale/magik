@@ -41,6 +41,10 @@ if __name__ == "__main__":
   parser.add_argument('--S3_URL', help='the location where Walrus is ' +
     'running (e.g., http://1.2.3.4:8773/services/Walrus)')
 
+  # Flags enabling users to specify their Azure credentials.
+  parser.add_argument('--AZURE_ACCOUNT_NAME')
+  parser.add_argument('--AZURE_ACCOUNT_KEY')
+
   # Parse the arguments and invoke the right command.
   args = vars(parser.parse_args(sys.argv[1:]))
   storage = StorageFactory.get_storage(args)
