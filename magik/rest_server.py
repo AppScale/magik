@@ -72,11 +72,14 @@ class RESTServer(webapp2.RequestHandler):
       'source' : path,
       'destination' : destination
     }]
-    storage.download_files(source_to_dest_list)
-    with open(destination, 'r') as file_handle:
-      self.response.write(file_handle.read())
-    os.remove(destination)
-    return self.SUCCESS
+    result = storage.download_files(source_to_dest_list)
+    if result[0]['success'] == True:
+      with open(destination, 'r') as file_handle:
+        self.response.write(file_handle.read())
+      os.remove(destination)
+    else:
+      self.response.write(json.dumps(result))
+    return
 
 
   def put(self, path):
