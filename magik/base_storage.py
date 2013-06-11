@@ -5,6 +5,9 @@ interface that details all of the operations that *Storage classes need
 to define to be magik-compatible. """
 
 
+import os.path
+
+
 class BaseStorage():
   """ BaseStorage defines a class that all *Storage classes inherit from,
   detailing to implementers of new *Storage classes what the method signatures
@@ -39,7 +42,31 @@ class BaseStorage():
         the upload was successful, and in case of failures, a field called
         'failure_reason' that explains why the file could not be uploaded.
     """
-    raise NotImplementedError
+    # TODO(cgb): Parallelize the upload process.
+    upload_result = source_to_dest_list[:]
+
+    for item_to_upload in upload_result:
+      # First, make sure the file to upload actually exists.
+      source = item_to_upload['source']
+      if not os.path.exists(source):
+        item_to_upload['success'] = False
+        item_to_upload['failure_reason'] = 'file not found'
+        continue
+
+      # Next, make sure the user specified a bucket in the destination.
+      destination = item_to_upload['destination']
+      bucket_name = destination.split('/')[1]
+      key_name = "/".join(destination.split('/')[2:])
+
+      # Make sure the bucket actually exists, and create it if it doesn't.
+      if not self.does_bucket_exist(bucket_name):
+        self.create_bucket(bucket_name)
+
+      # Finally, upload the file.
+      self.upload_file(source, bucket_name, key_name)
+      item_to_upload['success'] = True
+
+    return upload_result
 
 
   def download_files(self, source_to_dest_list):
@@ -56,4 +83,29 @@ class BaseStorage():
         the download was successful, and in case of failures, a field called
         'failure_reason' that explains why the file could not be downloaded.
     """
-    raise NotImplementedError
+    # TODO(cgb): Parallelize the download process.
+    download_result = source_to_dest_list[:]
+
+    for item_to_download in download_result:
+      # First, make sure the item to download actually exists.
+      source = item_to_download['source']
+      bucket_name = source.split('/')[1]
+      key_name = "/".join(source.split('/')[2:])
+
+      # It definitely doesn't exist if the bucket doesn't exist.
+      if not self.does_bucket_exist(bucket_name):
+        item_to_download['success'] = False
+        item_to_download['failure_reason'] = 'bucket not found'
+        continue
+
+      if not self.does_key_exist(bucket_name, key_name):
+        item_to_download['success'] = False
+        item_to_download['failure_reason'] = 'source not found'
+        continue
+
+      # Finally, download the file.
+      destination = item_to_download['destination']
+      self.download_file(destination, bucket_name, key_name)
+      item_to_download['success'] = True
+
+    return download_result
