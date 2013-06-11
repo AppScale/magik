@@ -58,90 +58,77 @@ class S3Storage(BaseStorage):
       aws_secret_access_key=self.aws_secret_key)
 
 
-  def upload_files(self, source_to_dest_list):
-    """ Uploads one or more files to Amazon S3.
+  def does_bucket_exist(self, bucket_name):
+    """ Queries Amazon S3 to see if the specified bucket exists or not.
 
     Args:
-      source_to_dest_list: A list of dicts, where each dict has a key named
-        'source' that points to the file on the local filesystem to upload,
-        and a key named 'destination' that points to where it should be
-        uploaded in Amazon S3. We presume that the bucket name is prepended to
-        the destination path, so a destination of '/mybucket/file.tgz' indicates
-        that we should upload this file to '/file.tgz' in the bucket 'mybucket'.
+      bucket_name: A str containing the name of the bucket we wish to query for
+        existence.
     Returns:
-      A copy of source_to_dest_list, with an extra field in each dict that
-        indicates if the upload was successful, and if not successful, the
-        reason why the upload failed.
+      True if the bucket does exist, and False otherwise.
     """
-    # TODO(cgb): Parallelize the upload process.
-    upload_result = source_to_dest_list[:]
-
-    for item_to_upload in upload_result:
-      # First, make sure the file to upload actually exists.
-      source = item_to_upload['source']
-      if not os.path.exists(source):
-        item_to_upload['success'] = False
-        item_to_upload['failure_reason'] = 'file not found'
-        continue
-
-      # Next, make sure the user specified a bucket in the destination.
-      destination = item_to_upload['destination']
-      bucket_name = destination.split('/')[1]
-      key_name = "/".join(destination.split('/')[2:])
-
-      # Make sure the bucket actually exists, and create it if it doesn't.
-      bucket = self.connection.lookup(bucket_name)
-      if not bucket:
-        bucket = self.connection.create_bucket(bucket_name)
-
-      # Finally, upload the file.
-      key = boto.s3.key.Key(bucket)
-      key.key = key_name
-      key.set_contents_from_filename(source)
-      item_to_upload['success'] = True
-
-    return upload_result
+    bucket = self.connection.lookup(bucket_name)
+    if bucket:
+      return True
+    else:
+      return False
 
 
-  def download_files(self, source_to_dest_list):
-    """ Downloads one or more files from Amazon S3.
+  def create_bucket(self, bucket_name):
+    """ Creates the named bucket in Amazon S3.
 
     Args:
-      source_to_dest_list: A list of dicts, where each dict has a key named
-        'source' that points to the file in Amazon S3 to download, and a key
-        named 'destination' that points to where it should be downloaded.
-    Returns:
-      A copy of the same list of dicts that was passed in as an argument,
-        with an extra field in each dict indicating if the download was
-        successful, and in case of failures, a field that explains why the
-        download failed.
+      bucket_name: A str containing the name of the bucket we wish to create.
     """
-    # TODO(cgb): Parallelize the download process.
-    download_result = source_to_dest_list[:]
+    self.connection.create_bucket(bucket_name)
 
-    for item_to_download in download_result:
-      # First, make sure the item to download actually exists.
-      source = item_to_download['source']
-      bucket_name = source.split('/')[1]
-      key_name = "/".join(source.split('/')[2:])
 
-      # It definitely doesn't exist if the bucket doesn't exist.
-      bucket = self.connection.lookup(bucket_name)
-      if not bucket:
-        item_to_download['success'] = False
-        item_to_download['failure_reason'] = 'bucket not found'
-        continue
+  def upload_file(self, source, bucket_name, key_name):
+    """ Uploads a file from the local filesystem to Amazon S3.
 
-      key = boto.s3.key.Key(bucket)
-      key.key = key_name
-      if not key.exists():
-        item_to_download['success'] = False
-        item_to_download['failure_reason'] = 'source not found'
-        continue
+    Args:
+      source: A str containing the name of the file on the local filesystem that
+        should be uploaded to Amazon S3.
+      bucket_name: A str containing the name of the bucket that the file should
+        be placed in.
+      key_name: A str containing the name of the key that the file should be
+        placed in.
+    """
+    bucket = self.connection.lookup(bucket_name)
+    key = boto.s3.key.Key(bucket)
+    key.key = key_name
+    key.set_contents_from_filename(source)
 
-      # Finally, download the file.
-      destination = item_to_download['destination']
-      key.get_contents_to_filename(destination)
-      item_to_download['success'] = True
 
-    return download_result
+  def does_key_exist(self, bucket_name, key_name):
+    """ Queries Amazon S3 to see if the named file exists.
+
+    Args:
+      bucket_name: A str containing the name of the bucket that the file exists
+        in.
+      key_name: A str containing the name of the key that identifies the file.
+    Returns:
+      True if a file does exist in the named bucket with the provided key name,
+        and False otherwise.
+    """
+    bucket = self.connection.lookup(bucket_name)
+    key = boto.s3.key.Key(bucket)
+    key.key = key_name
+    return key.exists()
+
+
+  def download_file(self, destination, bucket_name, key_name):
+    """ Downloads a file to the local filesystem from Amazon S3.
+
+    Args:
+      destination: A str containing the name of the file on the local filesystem
+        that we should download our file to.
+      bucket_name: A str containing the name of the bucket that the file should
+        be downloaded from.
+      key_name: A str containing the name of the key that the file should be
+        downloaded from.
+    """
+    bucket = self.connection.lookup(bucket_name)
+    key = boto.s3.key.Key(bucket)
+    key.key = key_name
+    key.get_contents_to_filename(destination)
