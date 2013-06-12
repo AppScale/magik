@@ -26,7 +26,7 @@ magik upload_files --name s3 --AWS_ACCESS_KEY YOUR_ACCESS_KEY --AWS_SECRET_KEY Y
 download a file
 ==============
 ```
-magik upload_files --name s3 --AWS_ACCESS_KEY YOUR_ACCESS_KEY --AWS_SECRET_KEY YOUR_SECRET_KEY --source /your-bucket-name/cat-photo.jpg --destination ~/cat-photo2.jpg
+magik download_files --name s3 --AWS_ACCESS_KEY YOUR_ACCESS_KEY --AWS_SECRET_KEY YOUR_SECRET_KEY --source /your-bucket-name/cat-photo.jpg --destination ~/cat-photo2.jpg
 ```
 
 using the REST API
