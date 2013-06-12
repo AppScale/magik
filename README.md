@@ -41,8 +41,11 @@ curl -X DELETE "http://127.0.0.1:8080/appscale/mykey?name=s3&AWS_ACCESS_KEY=$EC2
 magik supports
 ==============
 Amazon Simple Storage Service (S3)
+
 Google Cloud Storage
+
 Eucalyptus Walrus
+
 Microsoft Azure Blob Storage
 
 more TODOs
