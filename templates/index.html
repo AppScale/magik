@@ -1,0 +1,259 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+
+  <!-- Use the .htaccess and remove these lines to avoid edge case issues.
+       More info: h5bp.com/i/378 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Magik</title>
+  <meta name="description" content="An Easier Way to Use Cloud Storage Systems">
+  <meta name="author" content="Chris Bunch">
+
+  <!-- Mobile viewport optimized: h5bp.com/viewport -->
+  <meta name="viewport" content="width=device-width">
+
+
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+  <link rel="stylesheet" href="/static/css/bootstrap-responsive.css">
+  <link rel="stylesheet" href="/static/css/flat-ui.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+
+  <style>
+  </style>
+  <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
+
+  <!-- All JavaScript at the bottom, except this Modernizr build.
+       Modernizr enables HTML5 elements & feature detects for optimal performance.
+       Create your own custom Modernizr build: www.modernizr.com/download/ -->
+  <script src="/static/js/parsley.js"></script>
+  <script src="/static/js/libs/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+  <script src="/static/js/flat-js/jquery-1.8.2.min.js"></script>
+  <script src="/static/js/flat-js/jquery-ui-1.10.0.custom.min.js"></script>
+
+
+
+</head>
+
+<body>
+  <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  <!--[if lt IE 7]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+  <![endif]-->
+  <header>
+      <div id="navbar" class="navbar navbar-inverse navbar-fixed-top" xmlns="http://www.w3.org/1999/html">
+          <div class="navbar-inner">
+
+              <div class="container">
+                    <img id="logo" src="/static/img/appscale-logo.png">
+                  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                  </a>
+                  <a class="brand" href="/">Magik</a>
+                  <div class="nav-collapse collapse">
+                      <ul class="nav">
+                          <li><a href="http://www.github.com/AppScale/magik/README.md">README</a> </li>
+                          <li><a href="mailto:chris@appscale.com?subject=Magik">Contact</a></li>
+                      </ul>
+                  </div><!--/.nav-collapse -->
+              </div>
+          </div>
+      </div>
+  </header>
+
+  <div role="main">
+    <div class="container" xmlns="http://www.w3.org/1999/html">
+        <div class="row">
+            <div class="span12 hero-unit">
+                <h1>Welcome to the Magik UI!</h1>
+                <h3>Magik is an easier way to use cloud storage systems.</h3>
+                <p>
+                  Magik can upload, download, and delete data stored in Amazon S3, Google Cloud Storage, Eucalyptus Walrus, and Microsoft Azure Blob Storage.
+                </p>
+                <p><a href="http://www.github.com/AppScale/magik/README.md" class="btn btn-primary btn-large">Read more about Magik &raquo;</a></p>
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="span12">
+                <form action="/" method="post" enctype="multipart/form-data">
+
+                    <label>Step One: What cloud do you want to use?
+                    <label class="radio">
+                      <input name="cloud" type="radio" value="s3" />
+                      Amazon Simple Storage Service
+                    </label>
+                    <label class="radio">
+                      <input name="cloud" type="radio" value="gcs" />
+                      Google Cloud Storage
+                    </label>
+                    <label class="radio">
+                      <input name="cloud" type="radio" value="walrus" />
+                      Eucalyptus Walrus
+                    </label>
+                    <label class="radio">
+                      <input name="cloud" type="radio" value="azure" />
+                      Microsoft Azure Blob Service
+                    </label>
+
+                    <div id="cloud-s3" class="toHideCloud" style="display:none">
+                        <div>
+                          <br />
+                            <label>AWS Access Key:</label>
+                            <input type="text" name="AWS_ACCESS_KEY">
+                            <label>AWS Secret Key:</label>
+                            <input type="text" name="AWS_SECRET_KEY">
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <div id="cloud-gcs" class="toHideCloud" style="display:none">
+                        <div>
+                          <br />
+                            <label>GCE Access Key:</label>
+                            <input type="text" name="GCE_ACCESS_KEY">
+                            <label>GCE Secret Key:</label>
+                            <input type="text" name="GCE_SECRET_KEY">
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <div id="cloud-walrus" class="toHideCloud" style="display:none">
+                        <div>
+                          <br />
+                            <label>AWS Access Key:</label>
+                            <input type="text" name="WALRUS_ACCESS_KEY">
+                            <label>AWS Secret Key:</label>
+                            <input type="text" name="WALRUS_SECRET_KEY">
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <div id="cloud-azure" class="toHideCloud" style="display:none">
+                        <div>
+                          <br />
+                            <label>Azure Account Name:</label>
+                            <input type="text" name="AZURE_ACCOUNT_NAME">
+                            <label>Azure Account Key:</label>
+                            <input type="text" name="AZURE_ACCOUNT_KEY">
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <br />
+                    <label>Step Two: What do you want to do?</label>
+                    <label class="radio">
+                      <input id="rdb1 optionsRadio1" type="radio" name="directive" value="upload" />
+                      Upload a file
+                    </label>
+                    <label class="radio">
+                      <input id="rdb2" type="radio" name="directive" value="download" />
+                      Download a file
+                    </label>
+                    <label class="radio">
+                      <input id="rdb3" type="radio" name="directive" value="delete" />
+                      Delete a file
+                    </label>
+
+                    <div id="directive-upload" class="toHideDirective" style="display:none">
+                        <div>
+                          <br />
+                          Step Three: What do you want to upload, and where do you want to upload it to?
+                            <label>File to upload:</label>
+                            <input type="file" name="upload_file">
+                            <label>Destination Bucket:</label>
+                            <input type="text" name="upload_bucket">
+                            <label>Destination Key:</label>
+                            <input type="text" name="upload_key">
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <div id="directive-download" class="toHideDirective" style="display:none">
+                        <div>
+                          <br />
+                          Step Three: What do you want to download?
+                          <br />
+                          <br />
+                            <label>Source Bucket:</label>
+                            <input type="text" name="download_bucket">
+                            <label>Source Key:</label>
+                            <input type="text" name="download_key">
+                            <br><br>
+                        </div>
+                    </div>
+
+                    <div id="directive-delete" class="toHideDirective" style="display:none">
+                        <div>
+                          <br />
+                          Step Three: What do you want to delete?
+                          <br />
+                          <br />
+                            <label>Source Bucket:</label>
+                            <input type="text" name="delete_bucket">
+                            <label>Source Key:</label>
+                            <input type="text" name="delete_key">
+                            <br><br>
+                        </div>
+                    </div>
+
+                      <button type="submit" style="margin:0px 0 25px
+                      0px; width: 300px;" class="btn btn-large
+                      btn-success pull-left">Go!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div> 
+
+  </div>
+
+
+  <!-- JavaScript at the bottom for fast page loading -->
+
+
+
+    <!-- le scripts concatenated and minified via django-compressor -->
+  <!--<script src="/static/js/libs/bootstrap.min.js"></script>-->
+  <script src="/static/js/plugins.js"></script>
+  <script src="/static/js/main.js"></script>
+
+  <script src="/static/js/bootstrap.js"></script>
+
+    <!-- le flat ui js files -->
+
+  <script src="/static/js/flat-js/custom_checkbox_and_radio.js"></script>
+  <script src="/static/js/flat-js/custom_radio.js"></script>
+  <script src="/static/js/flat-js/html5shiv.js"></script>
+  <script src="/static/js/flat-js/jquery.tagsinput.js"></script>
+  <script src="/static/js/flat-js/bootstrap-tooltip.js"></script>
+  <script src="/static/js/flat-js/jquery.placeholder.js"></script>
+  <script src="/static/js/flat-js/jquery.dropkick-1.0.0.js"></script>
+  <script src="/static/js/flat-js/application.js"></script>
+
+
+
+  <!-- end scripts -->
+    <script type="text/javascript">
+
+    </script>
+  <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
+       mathiasbynens.be/notes/async-analytics-snippet -->
+  <script>
+    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s)}(document,'script'));
+  </script>
+</body>
+</html>

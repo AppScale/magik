@@ -17,7 +17,7 @@ import uuid
 
 
 # Third-party library imports
-import jinja2
+import requests
 import webapp2
 
 
@@ -188,7 +188,59 @@ class MagikUI(webapp2.RequestHandler):
 
 
   def post(self):
-    pass
+    cloud_name = self.request.get('cloud')
+    params = {"name" : cloud_name}
+
+    # get cloudy credentials
+    if cloud_name == "s3":
+      params["AWS_ACCESS_KEY"] = self.request.get('AWS_ACCESS_KEY')
+      params["AWS_SECRET_KEY"] = self.request.get('AWS_SECRET_KEY')
+    elif cloud_name == "gcs":
+      params["GCS_ACCESS_KEY"] = self.request.get('GCS_ACCESS_KEY')
+      params["GCS_SECRET_KEY"] = self.request.get('GCS_SECRET_KEY')
+    elif cloud_name == "walrus":
+      params["AWS_ACCESS_KEY"] = self.request.get('WALRUS_ACCESS_KEY')
+      params["AWS_SECRET_KEY"] = self.request.get('WALRUS_SECRET_KEY')
+    elif cloud_name == "azure":
+      params["AZURE_ACCOUNT_NAME"] = self.request.get('AZURE_ACCOUNT_NAME')
+      params["AZURE_ACCOUNT_KEY"] = self.request.get('AZURE_ACCOUNT_KEY')
+    else:
+      self.response.out.write(json.dumps({
+        "success" : False,
+        "failure_reason" : "need to specify a cloud"
+      }))
+      return
+
+    # get directive
+    directive = self.request.get('directive')
+    if directive == "upload":
+      method = "PUT"
+      url = "{0}/{1}".format(self.request.get("upload_bucket"),
+        self.request.get("upload_key"))
+      file_to_upload = self.request.get('upload_file')
+      request = requests.put("http://127.0.0.1:8080/{0}".format(url),
+        params=params, data=file_to_upload)
+    elif directive == "download":
+      method = "GET"
+      url = "{0}/{1}".format(self.request.get("download_bucket"),
+        self.request.get("download_key"))
+      request = requests.get("http://127.0.0.1:8080/{0}".format(url),
+        params=params)
+    elif directive == "delete":
+      method = "DELETE"
+      url = "{0}/{1}".format(self.request.get("delete_bucket"),
+        self.request.get("delete_key"))
+      request = requests.delete("http://127.0.0.1:8080/{0}".format(url),
+        params=params)
+    else:
+      self.response.out.write(json.dumps({
+        "success" : False,
+        "failure_reason" : "need to specify a directive"
+      }))
+      return
+
+    # print the response
+    self.response.out.write(request.text)
 
 
 class StaticFileHandler(webapp2.RequestHandler):
@@ -196,14 +248,13 @@ class StaticFileHandler(webapp2.RequestHandler):
 
   def get(self, path):
     abs_path = os.path.dirname(__file__) + "/../static/" + path
-    if os.path.isdir(abs_path) or abs_path.find(os.getcwd()) != 0:
+    if os.path.isdir(abs_path): #or abs_path.find(os.getcwd()) != 0:
       self.response.set_status(403)
       return
 
     try:
       with open(abs_path, 'r') as file_handle:
-        self.response.headers.add_header('Content-Type',
-          mimetypes.guess_type(abs_path)[0])
+        self.response.headers['Content-Type'] = mimetypes.guess_type(abs_path)[0]
         self.response.out.write(file_handle.read())
     except:
       self.response.set_status(404)
