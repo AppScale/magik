@@ -17,7 +17,6 @@ import uuid
 
 
 # Third-party library imports
-import jinja2
 import requests
 import webapp2
 
