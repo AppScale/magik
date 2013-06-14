@@ -15,6 +15,7 @@ when using magik-server:
 easy_install WebOb
 easy_install Paste
 easy_install webapp2
+easy_install requests
 ```
 
 upload a file
