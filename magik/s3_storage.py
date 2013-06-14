@@ -15,8 +15,8 @@ import boto.s3.key
 
 
 # S3Storage-specific imports
-from base_storage import BaseStorage
-from custom_exceptions import BadConfigurationException
+from magik.base_storage import BaseStorage
+from magik.custom_exceptions import BadConfigurationException
 
 
 class S3Storage(BaseStorage):
