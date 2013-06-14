@@ -1,4 +1,6 @@
 watch('(.*).(py)') { |md|
-  system "python tests/test_suite.py"
-  system "pylint --indent-string='  ' magik"
+  tests_pass = system "python tests/test_suite.py"
+  if tests_pass
+    system "pylint --indent-string='  ' magik"
+  end
 }
