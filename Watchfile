@@ -1,3 +1,4 @@
 watch('(.*).(py)') { |md|
   system "python tests/test_suite.py"
+  system "pylint --indent-string='  ' magik"
 }
