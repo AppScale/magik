@@ -4,18 +4,13 @@
 to interact with Microsoft Azure's Blob Storage. """
 
 
-# General-purpose Python library imports
-import os.path
-import re
-
-
 # Third-party libraries
 import azure.storage
 
 
 # S3Storage-specific imports
-from base_storage import BaseStorage
-from custom_exceptions import BadConfigurationException
+from magik.base_storage import BaseStorage
+from magik.custom_exceptions import BadConfigurationException
 
 
 class AzureStorage(BaseStorage):
