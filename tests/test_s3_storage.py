@@ -16,7 +16,7 @@ from flexmock import flexmock
 
 
 # S3 storage import, the library that we're testing here
-lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
+lib = os.path.dirname(__file__) + os.sep + ".."
 sys.path.append(lib)
 from magik.custom_exceptions import BadConfigurationException
 from magik.storage_factory import StorageFactory

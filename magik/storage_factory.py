@@ -5,11 +5,11 @@ to create connections to each type of cloud storage that magik supports. """
 
 
 # magik-specific imports
-from custom_exceptions import BadConfigurationException
-from azure_storage import AzureStorage
-from gc_storage import GCStorage
-from s3_storage import S3Storage
-from walrus_storage import WalrusStorage
+from magik.custom_exceptions import BadConfigurationException
+from magik.azure_storage import AzureStorage
+from magik.gc_storage import GCStorage
+from magik.s3_storage import S3Storage
+from magik.walrus_storage import WalrusStorage
 
 
 class StorageFactory():

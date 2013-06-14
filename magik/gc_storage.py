@@ -6,12 +6,11 @@ interact with Google Cloud Storage (GCS). """
 
 # Third-party libraries
 import boto.gs.connection
-#import boto.s3.key
 
 
 # GCStorage-specific imports
-from s3_storage import S3Storage
-from custom_exceptions import BadConfigurationException
+from magik.s3_storage import S3Storage
+from magik.custom_exceptions import BadConfigurationException
 
 
 class GCStorage(S3Storage):

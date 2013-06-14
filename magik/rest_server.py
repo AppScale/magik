@@ -22,7 +22,7 @@ import webapp2
 
 
 # Magik library imports
-from storage_factory import StorageFactory
+from magik.storage_factory import StorageFactory
 
 
 class RESTServer(webapp2.RequestHandler):

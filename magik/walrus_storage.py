@@ -14,8 +14,8 @@ import boto.s3.key
 
 
 # WalrusStorage-specific imports
-from s3_storage import S3Storage
-from custom_exceptions import BadConfigurationException
+from magik.s3_storage import S3Storage
+from magik.custom_exceptions import BadConfigurationException
 
 
 class WalrusStorage(S3Storage):
