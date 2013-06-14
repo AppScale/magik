@@ -24,10 +24,19 @@ from rest_server import StaticFileHandler
 
 
 if __name__ == "__main__":
+  parser = argparse.ArgumentParser(description='Upload or download files ' +
+    'from supported cloud storage systems via a RESTful interface.')
+
+  parser.add_argument('--address', '-a', default='127.0.0.1',
+    help='the IP or FQDN that the web server should bind to')
+  parser.add_argument('--port', '-p', default=8080, type=int,
+    help='the port number that the web server should bind to')
+  args = vars(parser.parse_args(sys.argv[1:]))
+
   app = webapp2.WSGIApplication([
    ('/', MagikUI),
    ('/static/(.+)', StaticFileHandler),
    ('(.*)', RESTServer),
   ], debug=True)
 
-  httpserver.serve(app, host='127.0.0.1', port='8080')
+  httpserver.serve(app, host=args['address'], port=args['port'])
