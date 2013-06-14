@@ -4,11 +4,6 @@
 interact with Google Cloud Storage (GCS). """
 
 
-# General-purpose Python library imports
-import os.path
-import re
-
-
 # Third-party libraries
 import boto.gs.connection
 #import boto.s3.key

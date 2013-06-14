@@ -5,7 +5,6 @@ use to interact with Walrus. """
 
 
 # General-purpose Python library imports
-import os.path
 import re
 
 

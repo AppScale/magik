@@ -4,11 +4,6 @@
 interact with Amazon's Simple Storage Service (S3). """
 
 
-# General-purpose Python library imports
-import os.path
-import re
-
-
 # Third-party libraries
 import boto.s3.connection
 import boto.s3.key
