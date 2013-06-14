@@ -63,6 +63,8 @@ class TestRESTServer(unittest.TestCase):
     fake_storage.should_receive('download_files').with_args([{
       'source' : '/baz/gbaz.txt',
       'destination' : '/tmp/magik-temp-123'
+    }]).and_return([{
+      'success' : True
     }])
 
     flexmock(StorageFactory)
@@ -77,7 +79,7 @@ class TestRESTServer(unittest.TestCase):
     flexmock(os)
     os.should_receive('remove').with_args('/tmp/magik-temp-123')
 
-    self.assertEquals(RESTServer.SUCCESS, server.get('/baz/gbaz.txt'))
+    self.assertEquals(None, server.get('/baz/gbaz.txt'))
 
 
   def test_put_route_without_body(self):
@@ -86,7 +88,7 @@ class TestRESTServer(unittest.TestCase):
     server.request = flexmock(body='')
     server.response = flexmock()
     server.response.should_receive('write').and_return()
-    self.assertEquals(RESTServer.FAILURE, server.put('/baz/gbaz.txt'))
+    self.assertEquals(None, server.put('/baz/gbaz.txt'))
 
 
   def test_put_route_with_s3_credentials(self):
@@ -142,4 +144,4 @@ class TestRESTServer(unittest.TestCase):
     flexmock(os)
     os.should_receive('remove').with_args('/tmp/magik-temp-123')
 
-    self.assertEquals(RESTServer.SUCCESS, server.put('/baz/gbaz.txt'))
+    self.assertEquals(None, server.put('/baz/gbaz.txt'))
