@@ -151,3 +151,66 @@ class BaseStorage():
       item_to_delete['success'] = True
 
     return delete_result
+
+
+  def does_bucket_exist(self, bucket_name):
+    """ Queries the underlying storage platform to see if the named bucket
+    exists.
+
+    Args:
+      bucket_name: A str that represents the name of the bucket to check for
+        existence.
+    Returns:
+      True if the named bucket exists, and False otherwise.
+    """
+    raise NotImplementedError
+
+
+  def create_bucket(self, bucket_name):
+    """ Creates a new bucket in the underlying storage platform.
+
+    Args:
+      bucket_name: A str that represents the name of the bucket to create.
+    """
+    raise NotImplementedError
+
+
+  def does_key_exist(self, bucket_name, key_name):
+    """ Queries the underlying storage platform to see if the named file exists.
+
+    Args:
+      bucket_name: A str containing the name of the bucket that the file exists
+        in.
+      key_name: A str containing the name of the key that identifies the file.
+    Returns:
+      True if a file does exist in the named bucket with the provided key name,
+        and False otherwise.
+    """
+    raise NotImplementedError
+
+
+  def download_file(self, destination, bucket_name, key_name):
+    """ Downloads a file to the local filesystem from the underlying storage
+    platform.
+
+    Args:
+      destination: A str containing the name of the file on the local filesystem
+        that we should download our file to.
+      bucket_name: A str containing the name of the bucket that the file should
+        be downloaded from.
+      key_name: A str containing the name of the key that the file should be
+        downloaded from.
+    """
+    raise NotImplementedError
+
+
+  def delete_file(self, bucket_name, key_name):
+    """ Deletes a file stored in the underlying storage platform.
+
+    Args:
+      bucket_name: A str containing the name of the bucket that the file should
+        be downloaded from.
+      key_name: A str containing the name of the key that the file should be
+        downloaded from.
+    """
+    raise NotImplementedError
