@@ -5,7 +5,6 @@ use to interact with Walrus. """
 
 
 # General-purpose Python library imports
-import os.path
 import re
 
 
@@ -15,8 +14,8 @@ import boto.s3.key
 
 
 # WalrusStorage-specific imports
-from s3_storage import S3Storage
-from custom_exceptions import BadConfigurationException
+from magik.s3_storage import S3Storage
+from magik.custom_exceptions import BadConfigurationException
 
 
 class WalrusStorage(S3Storage):
@@ -35,14 +34,7 @@ class WalrusStorage(S3Storage):
         specified, or if S3_URL is not a URL (e.g., of the form
         http://1.2.3.4:8773/services/Walrus).
     """
-    if 'AWS_ACCESS_KEY' not in parameters:
-      raise BadConfigurationException("AWS_ACCESS_KEY needs to be specified")
-
-    if 'AWS_SECRET_KEY' not in parameters:
-      raise BadConfigurationException("AWS_SECRET_KEY needs to be specified")
-
-    self.aws_access_key = parameters['AWS_ACCESS_KEY']
-    self.aws_secret_key = parameters['AWS_SECRET_KEY']
+    self.setup_s3_credentials(parameters)
 
     if 'S3_URL' not in parameters:
       raise BadConfigurationException("S3_URL needs to be specified")
