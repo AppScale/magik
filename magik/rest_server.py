@@ -12,7 +12,6 @@ See bin/magik-server for how this server is started and controlled. """
 import json
 import mimetypes
 import os
-import sys
 import uuid
 
 
@@ -22,10 +21,18 @@ import webapp2
 
 
 # Magik library imports
-from storage_factory import StorageFactory
+from magik.storage_factory import StorageFactory
 
 
 class RESTServer(webapp2.RequestHandler):
+  """ RESTServer defines a web server with routes to upload, download, and
+  delete data from cloud storage platforms, which map to Magik methods.
+
+  These routes are provided in a RESTful fashion: a GET /bucket/filename
+  results in downloading the file 'filename' from the bucket 'bucket', and
+  in the same fashion, a PUT /bucket/filename uploads data to the file
+  'filename' in the bucket 'bucket'.
+  """
 
 
   # A string constant that URL handlers can return to indicate that the
@@ -180,14 +187,26 @@ class RESTServer(webapp2.RequestHandler):
 
 
 class MagikUI(webapp2.RequestHandler):
+  """ MagikUI provides handlers that display a web interface to the Magik API.
+
+  Specifically, it exposes a route that renders a web page to let users fill in
+  data needed to issue a request (the GET route), and another route that
+  performs the request (the POST route).
+  """
 
 
   def get(self):
+    """ Displays the welcome page, which tells users how to upload, download,
+    and delete their files.
+    """
     index_file = os.path.dirname(__file__) + "/../templates/index.html"
     self.response.out.write(file(index_file).read())
 
 
   def post(self):
+    """ Constructs a Magik API request based on the form values the user
+    inputted, issues the request, and prints out the response.
+    """
     cloud_name = self.request.get('cloud')
     params = {"name" : cloud_name}
 
@@ -214,20 +233,17 @@ class MagikUI(webapp2.RequestHandler):
     # get directive
     directive = self.request.get('directive')
     if directive == "upload":
-      method = "PUT"
       url = "{0}/{1}".format(self.request.get("upload_bucket"),
         self.request.get("upload_key"))
       file_to_upload = self.request.get('upload_file')
       request = requests.put("http://127.0.0.1:8080/{0}".format(url),
         params=params, data=file_to_upload)
     elif directive == "download":
-      method = "GET"
       url = "{0}/{1}".format(self.request.get("download_bucket"),
         self.request.get("download_key"))
       request = requests.get("http://127.0.0.1:8080/{0}".format(url),
         params=params)
     elif directive == "delete":
-      method = "DELETE"
       url = "{0}/{1}".format(self.request.get("delete_bucket"),
         self.request.get("delete_key"))
       request = requests.delete("http://127.0.0.1:8080/{0}".format(url),
@@ -244,9 +260,24 @@ class MagikUI(webapp2.RequestHandler):
 
 
 class StaticFileHandler(webapp2.RequestHandler):
+  """ As webapp2 doesn't have any built-in capabilities to handle static files,
+  we implement our own here.
+
+  StaticFileHandler reads the local filesystem to read files specified in the
+  URL and serve them accordingly.
+
+  TODO(cgb): Make sure that callers can't read files outside of magik's
+  directory.
+  """
 
 
   def get(self, path):
+    """ Interprets path as a file to read in magik's homedir, reads it, and
+    serves it.
+
+    Args:
+      path: A str representing the file to serve.
+    """
     abs_path = os.path.dirname(__file__) + "/../static/" + path
     if os.path.isdir(abs_path): #or abs_path.find(os.getcwd()) != 0:
       self.response.set_status(403)
@@ -254,7 +285,8 @@ class StaticFileHandler(webapp2.RequestHandler):
 
     try:
       with open(abs_path, 'r') as file_handle:
-        self.response.headers['Content-Type'] = mimetypes.guess_type(abs_path)[0]
+        self.response.headers['Content-Type'] = mimetypes.guess_type(
+          abs_path)[0]
         self.response.out.write(file_handle.read())
     except:
       self.response.set_status(404)

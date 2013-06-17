@@ -14,10 +14,10 @@ from flexmock import flexmock
 
 
 # Storage factory import, the library that we're testing here
-lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
+lib = os.path.dirname(__file__) + os.sep + ".."
 sys.path.append(lib)
-from custom_exceptions import BadConfigurationException
-from storage_factory import StorageFactory
+from magik.custom_exceptions import BadConfigurationException
+from magik.storage_factory import StorageFactory
 
 
 class TestStorageFactory(unittest.TestCase):

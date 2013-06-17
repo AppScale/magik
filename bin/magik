@@ -11,9 +11,9 @@ import sys
 
 
 # Magik library imports
-lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
+lib = os.path.dirname(__file__) + os.sep + ".."
 sys.path.append(lib)
-from storage_factory import StorageFactory
+from magik.storage_factory import StorageFactory
 
 
 if __name__ == "__main__":

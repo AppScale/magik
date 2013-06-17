@@ -4,19 +4,14 @@
 interact with Amazon's Simple Storage Service (S3). """
 
 
-# General-purpose Python library imports
-import os.path
-import re
-
-
 # Third-party libraries
 import boto.s3.connection
 import boto.s3.key
 
 
 # S3Storage-specific imports
-from base_storage import BaseStorage
-from custom_exceptions import BadConfigurationException
+from magik.base_storage import BaseStorage
+from magik.custom_exceptions import BadConfigurationException
 
 
 class S3Storage(BaseStorage):
@@ -34,14 +29,7 @@ class S3Storage(BaseStorage):
       BadConfigurationException: If AWS_ACCESS_KEY or AWS_SECRET_KEY is not
         specified.
     """
-    if 'AWS_ACCESS_KEY' not in parameters:
-      raise BadConfigurationException("AWS_ACCESS_KEY needs to be specified")
-
-    if 'AWS_SECRET_KEY' not in parameters:
-      raise BadConfigurationException("AWS_SECRET_KEY needs to be specified")
-
-    self.aws_access_key = parameters['AWS_ACCESS_KEY']
-    self.aws_secret_key = parameters['AWS_SECRET_KEY']
+    self.setup_s3_credentials(parameters)
     self.connection = self.create_s3_connection()
     # TODO(cgb): Consider validating the user's credentials here, and throw
     # a BadConfigurationException if they aren't valid.
@@ -56,6 +44,27 @@ class S3Storage(BaseStorage):
     return boto.s3.connection.S3Connection(
       aws_access_key_id=self.aws_access_key,
       aws_secret_access_key=self.aws_secret_key)
+
+
+  def setup_s3_credentials(self, parameters):
+    """ Ensures that the user has passed in the credentials necessary to
+    communicate with Amazon S3.
+
+    Args:
+      parameters: A dict that contains the credentials necessary to authenticate
+        with S3.
+    Raises:
+      BadConfigurationException: If AWS_ACCESS_KEY or AWS_SECRET_KEY is not
+        specified.
+    """
+    if 'AWS_ACCESS_KEY' not in parameters:
+      raise BadConfigurationException("AWS_ACCESS_KEY needs to be specified")
+
+    if 'AWS_SECRET_KEY' not in parameters:
+      raise BadConfigurationException("AWS_SECRET_KEY needs to be specified")
+
+    self.aws_access_key = parameters['AWS_ACCESS_KEY']
+    self.aws_secret_key = parameters['AWS_SECRET_KEY']
 
 
   def does_bucket_exist(self, bucket_name):

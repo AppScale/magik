@@ -15,10 +15,10 @@ from flexmock import flexmock
 
 
 # RESTServer import, the library that we're testing here
-lib = os.path.dirname(__file__) + os.sep + ".." + os.sep + "magik"
+lib = os.path.dirname(__file__) + os.sep + ".."
 sys.path.append(lib)
-from rest_server import RESTServer
-from storage_factory import StorageFactory
+from magik.rest_server import RESTServer
+from magik.storage_factory import StorageFactory
 
 
 class TestRESTServer(unittest.TestCase):
