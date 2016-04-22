@@ -56,7 +56,3 @@ parallelized downloads and uploads
 miscellaneous
 ==============
 to use Google Cloud Storage, you'll need an access key and secret key. get them at https://code.google.com/apis/console#:storage:legacy
-
-get help
-==============
-E-mail Chris Bunch (chris@appscale.com) or file an issue!
